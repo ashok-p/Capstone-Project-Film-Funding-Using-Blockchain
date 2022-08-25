@@ -11,6 +11,10 @@ load_dotenv('my.env')
 # Define and connect a new Web3 provider
 w3 = Web3(Web3.HTTPProvider(os.getenv("WEB3_PROVIDER_URI")))
 
+#get abi and film_data paths
+abi_path=os.getenv("ABI_PATH")
+film_data_path=os.getenv("FILM_DATA_PATH")
+
 ################################################################################
 # Contract Helper function:
 # 1. Loads the contract once using cache
@@ -22,7 +26,8 @@ w3 = Web3(Web3.HTTPProvider(os.getenv("WEB3_PROVIDER_URI")))
 def load_contract():
 
     # Load the contract ABI
-    with open(Path('./contracts/compiled/bolly.json')) as f:
+    abi_path=os.getenv("ABI_PATH")
+    with open(Path(abi_path + 'bolly.json')) as f:
         contract_abi = json.load(f)
 
     # Set the contract address (this is the address of the deployed contract)
@@ -39,7 +44,6 @@ def load_contract():
 
 # Load the contract
 contract = load_contract()
-
 
 st.title("Light-Camera-Action")
 # import Image from pillow to open images
@@ -62,18 +66,35 @@ accounts = w3.eth.accounts
 project = st.selectbox("Select Film Project", options=['PGRO', 'SJSM', 'BGRO'])
 st.markdown("---")
 
-pdf_file = project + '.pdf'
+pdf_file = "./film_projects/"+project.lower() + '/synopsis.pdf'
+#webbrowser.open_new(pdf_file)
+'''
 with open(pdf_file,"rb") as f:
-      base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+    pdfReader = PyPDF2.PdfFileReader(f)
+    st.markdown("## "+pdf_file+"...pages")
 
-pdf_display = F'<embed src=”data:application/pdf;base64,{base64_pdf}” width=”700″ height=”1000″ type=”application/pdf”>'
+    st.write(pdfReader.numPages)
+    for page in range(pdfReader.numPages):
+  
+        # creating rotated page object
+        pageObj = pdfReader.getPage(page)
+        st.write(pageObj)
 
-st.markdown(pdf_display, unsafe_allow_html=True)
+    st.markdown("## pdf data")
+
+    st.write(pdfReader)
+
+#      base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+
+#pdf_display = F'<embed src=”data:application/pdf;base64,{base64_pdf}” width=”700″ height=”1000″ type=”application/pdf”>'
+
+#st.markdown(pdf_display, unsafe_allow_html=True)
+'''
 
 ################################################################################
 # Register New Artwork
 ################################################################################
-st.markdown("## Register new Artwork")
+# st.markdown("## Register new Artwork")
 # Create the streamlit components required to get the following data from the user:
 # 1. Artwork name
 artworkName = st.text_input("Artwork Name")
@@ -108,7 +129,8 @@ st.markdown("---")
 # Appraise Art
 ################################################################################
 st.markdown("## Appraise Artwork")
-tokens = contract.functions.totalSupply().call()
+#tokens = contract.functions.totalSupply().call()
+tokens=1
 token_id = st.selectbox("Choose an Art Token ID", list(range(tokens)))
 new_appraisal_value = st.text_input("Enter the new appraisal amount")
 report_uri = st.text_area("Enter notes about the appraisal")

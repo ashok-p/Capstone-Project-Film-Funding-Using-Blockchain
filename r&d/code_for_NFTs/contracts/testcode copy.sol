@@ -85,7 +85,7 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
     }
     */
 
-    function buyersList( 
+    function buildBuyersList( 
                     address buyerAddr,  // buyers wallet addr, can/will be paid profit upon realization
                     string memory buyersName,  // buyers name.. oops!
                     uint256 tokenPurchased,  // which token or NFT
@@ -120,7 +120,7 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
                 buyersList[buyerAddress[i]].numberOfTokensToBuy, // how many
                 ""      // no more data needed to be passed, thats why null ""
             );
-            updateMintedTokenCount(tokenId, numberOfTokensToBuy);
+            updateMintedTokenCount(tokenId, buyersList[buyerAddress[i]].numberOfTokensToBuy);
         }
     }
     // Refund the buyers if. the campaign was unsuccessful
@@ -250,9 +250,9 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
         // added file_hash for ease of display in Streamlit-IPFS, 
         // added tokenId on RHS, though not needed here, but eases work from Streamlit for updating
         // count of tokens/tokenId
-
+        uint256 mintedAmt = 0;
         
-        tokenCollection[tokenId] = tokenInfo(owner, film, filmItem, initialPrice, howMany, availNow, commission, nftURI, file_hash, data, tokenId);
+        tokenCollection[tokenId] = tokenInfo(owner, film, filmItem, initialPrice, howMany, availNow,mintedAmt, commission, nftURI, file_hash, data, tokenId);
         tokenBalance[tokenId] = howMany; //initialize the totalcount of this token
         _uris[tokenId] = nftURI;  // uri of the token  mapped to tokenID
         _idOfUris[nftURI] = tokenId;  // tokenId mapped to Uri
@@ -300,7 +300,7 @@ function updateMintedTokenCount(uint256 Id, uint256 count) public {
         // minting the tokens per tokenid
 
         mintedTokenBalance[Id] = mintedTokenBalance[Id] + count;
-        tokenCollection[id].minted = mintedTokenBalance[Id];
+        tokenCollection[Id].minted = mintedTokenBalance[Id];
     }
 
 // number of types of tokens available for sale. For each token there is ONE item in case of a NFT

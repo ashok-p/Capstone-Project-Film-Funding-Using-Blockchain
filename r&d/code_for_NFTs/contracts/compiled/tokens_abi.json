@@ -36,65 +36,6 @@
         "type": "event"
     },
     {
-        "inputs": [],
-        "name": "balanceTime",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "buyerAddr",
-                "type": "address"
-            },
-            {
-                "internalType": "string",
-                "name": "buyersName",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenPurchased",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "numOfTokens",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "pricePaid",
-                "type": "uint256"
-            }
-        ],
-        "name": "buyersListMintAndPay",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "newTime",
-                "type": "uint256"
-            }
-        ],
-        "name": "extendTime",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "bytes32",
@@ -169,6 +110,26 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "pause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "Paused",
+        "type": "event"
+    },
+    {
         "inputs": [
             {
                 "internalType": "uint256",
@@ -187,105 +148,6 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "refund_buyers",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenid",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "count",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "recipient",
-                "type": "address"
-            }
-        ],
-        "name": "refundForTokens",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address payable",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "internalType": "string",
-                "name": "film",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "filmItem",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "initialPrice",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "howMany",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "availNow",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "commission",
-                "type": "uint256"
-            },
-            {
-                "internalType": "string",
-                "name": "nftURI",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "file_hash",
-                "type": "string"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
-            }
-        ],
-        "name": "registerToken",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "bytes32",
@@ -299,13 +161,6 @@
             }
         ],
         "name": "renounceRole",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "reset_buyerlist",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -490,22 +345,12 @@
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "ethToRaise",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "timeBegin",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "timeInSeconds",
-                "type": "uint256"
+                "internalType": "string",
+                "name": "newuri",
+                "type": "string"
             }
         ],
-        "name": "setCampaignTarget",
+        "name": "setURI",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -585,37 +430,8 @@
         "type": "event"
     },
     {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "Id",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "count",
-                "type": "uint256"
-            }
-        ],
-        "name": "updateRefundTokenCount",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "Id",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "count",
-                "type": "uint256"
-            }
-        ],
-        "name": "updateTokenCount",
+        "inputs": [],
+        "name": "unpause",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -637,6 +453,19 @@
             }
         ],
         "name": "URI",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "Unpaused",
         "type": "event"
     },
     {
@@ -688,64 +517,6 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "buyerAddress",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "buyersList",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "addrOfBuyer",
-                "type": "address"
-            },
-            {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "numberOfTokensToBuy",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "purchasePrice",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "DEFAULT_ADMIN_ROLE",
         "outputs": [
@@ -778,51 +549,6 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "fundsRaisedSoFar",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "fundsToRaise",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "uri",
-                "type": "string"
-            }
-        ],
-        "name": "getIdFromUri",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "bytes32",
@@ -836,25 +562,6 @@
                 "internalType": "bytes32",
                 "name": "",
                 "type": "bytes32"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-            }
-        ],
-        "name": "getUri",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
             }
         ],
         "stateMutability": "view",
@@ -923,12 +630,12 @@
     },
     {
         "inputs": [],
-        "name": "msgsender",
+        "name": "paused",
         "outputs": [
             {
-                "internalType": "address",
+                "internalType": "bool",
                 "name": "",
-                "type": "address"
+                "type": "bool"
             }
         ],
         "stateMutability": "view",
@@ -936,51 +643,12 @@
     },
     {
         "inputs": [],
-        "name": "numberOfTokens",
+        "name": "PAUSER_ROLE",
         "outputs": [
             {
-                "internalType": "uint256",
+                "internalType": "bytes32",
                 "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "ownerAddress",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "rate",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "startTime",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
+                "type": "bytes32"
             }
         ],
         "stateMutability": "view",
@@ -1000,126 +668,6 @@
                 "internalType": "bool",
                 "name": "",
                 "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "timeTarget",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "tokenBalance",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "tokenCollection",
-        "outputs": [
-            {
-                "internalType": "address payable",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "internalType": "string",
-                "name": "film",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "filmItem",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "value",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "availableNow",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "commission",
-                "type": "uint256"
-            },
-            {
-                "internalType": "string",
-                "name": "uri",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "file_hash",
-                "type": "string"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
-            },
-            {
-                "internalType": "uint256",
-                "name": "tokenid",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "Id",
-                "type": "uint256"
-            }
-        ],
-        "name": "tokenCount",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -1158,6 +706,19 @@
                 "internalType": "string",
                 "name": "",
                 "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "URI_SETTER_ROLE",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
             }
         ],
         "stateMutability": "view",

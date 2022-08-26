@@ -26,8 +26,9 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
         string film;
         string filmItem;
         uint256 value;  //price for this one
-        uint256 amount; //how many of this nft
-        uint256 availableNow;
+        uint256 amount; //how many of this nft in total
+        uint256 availableNow; // how many remaining to be committed for sale
+        uint256 minted; // how many minted
         uint256 commission;
         string uri;  //uri of the. token
         string file_hash; // for Streamlit Ease
@@ -60,7 +61,7 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
     mapping (address => buyer) public buyersList;
     address [] public buyerAddress;
 
-    function buyersListMintAndPay( 
+   /* function buyersListMintAndPay( 
                     address buyerAddr,  // buyers wallet addr, can/will be paid profit upon realization
                     string memory buyersName,  // buyers name.. oops!
                     uint256 tokenPurchased,  // which token or NFT
@@ -82,22 +83,46 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
         payForTokens(pricePaid, owner_address); //pay to the owner for tokens
         updateTokenCount(tokenPurchased, numOfTokens); //update tokencount
     }
+    */
+
+    function buyersList( 
+                    address buyerAddr,  // buyers wallet addr, can/will be paid profit upon realization
+                    string memory buyersName,  // buyers name.. oops!
+                    uint256 tokenPurchased,  // which token or NFT
+                    uint256 numOfTokens,  // how many of those tokens, 1 for NFT - obviously!
+                    uint256 price
+                    ) public {
+        buyersList[buyerAddr] = buyer(
+                    buyerAddr,
+                    buyersName,
+                    tokenPurchased,
+                    numOfTokens,
+                    price);
+
+        // make an array of addresses as we add buyer to the buyerslist, because iterating over mapping is not possible
+        // this is a workaround to iterate over the mapping,i.e. buyersList. 
+
+        buyerAddress.push(buyerAddr);  //push adds the item to the array
+        updateTokenCount(tokenPurchased, numOfTokens); //update tokencount
+    }
 
     // After building the orderbook called buyersList, each entry in this mappping is an order.
     // The decision whether the Target is reached is taken elsewhere in the program
 
-    //function mint_buyersList() public {
-    //  for (uint i=0; i < buyerAddress.length ; i++){
+    function mint_buyersList() public {
+      for (uint i=0; i < buyerAddress.length ; i++){
             // mint(owner, tokenId, howMany, data);
             // buyersList is a mapping, it is acccessed through an array that was created while building
             // the buyersList, so it is in the same exact sequence
-    //        mint ( 
-     //           buyersList[buyerAddress[i]].addrOfBuyer,  //buyer's address that can be paid dividend/profit
-    //            buyersList[buyerAddress[i]].tokenId, // which token, ie tokenID
-    //            ""      // no more data needed to be passed, thats why null ""
-    //        );
-    //    }
-    //}
+            mint ( 
+                buyersList[buyerAddress[i]].addrOfBuyer,  //buyer's address that can be paid dividend/profit
+                buyersList[buyerAddress[i]].tokenId, // which token, ie tokenID
+                buyersList[buyerAddress[i]].numberOfTokensToBuy, // how many
+                ""      // no more data needed to be passed, thats why null ""
+            );
+            updateMintedTokenCount(tokenId, numberOfTokensToBuy);
+        }
+    }
     // Refund the buyers if. the campaign was unsuccessful
 
     function refund_buyers() public {
@@ -269,6 +294,15 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
         tokenCollection[Id].availableNow = tokenBalance[Id];
 
     }
+mapping(uint256=>uint256) mintedTokenBalance;
+
+function updateMintedTokenCount(uint256 Id, uint256 count) public {
+        // minting the tokens per tokenid
+
+        mintedTokenBalance[Id] = mintedTokenBalance[Id] + count;
+        tokenCollection[id].minted = mintedTokenBalance[Id];
+    }
+
 // number of types of tokens available for sale. For each token there is ONE item in case of a NFT
 // and in case of FT (fungible token) there are generally MORE than ONE copies of the same item for that TOKEN
 // do not confuse this numberOfTokens from total number of items for sale, which could be significantly large

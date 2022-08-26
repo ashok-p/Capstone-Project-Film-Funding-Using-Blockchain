@@ -10,14 +10,15 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     uint256 public rate;    
-    address  owner_address;                      
+    address payable owner_address;      
+                
 
     constructor(uint exchangeRate) ERC1155("") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
 
         rate = exchangeRate; //wei to token unit
-        owner_address = msg.sender;
+        owner_address = msg.sender; // somehow this line got deleted earlier...was causing grief
     }
 
 // NftMetaData for NFT assigned to n investor
@@ -47,7 +48,7 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
     mapping (string => uint256) private _idOfUris;
 
     struct buyer {
-        address  addrOfBuyer;
+        address  payable addrOfBuyer;
         string  name;
         uint256 tokenId;
         uint256 numberOfTokensToBuy;
@@ -61,7 +62,7 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
     address [] public buyerAddress;
 
     function buyersListMintAndPay( 
-                    address buyerAddr,  // buyers wallet addr, can/will be paid profit upon realization
+                    address payable buyerAddr,  // buyers wallet addr, can/will be paid profit upon realization
                     string memory buyersName,  // buyers name.. oops!
                     uint256 tokenPurchased,  // which token or NFT
                     uint256 numOfTokens,  // how many of those tokens, 1 for NFT - obviously!
@@ -75,7 +76,8 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
                     pricePaid);
 
         // make an array of addresses as we add buyer to the buyerslist, because iterating over mapping is not possible
-        // this is a workaround to iterate over the mapping,i.e. buyersList. 
+        // this is a workaround to iterate over the mapping,i.e. buyersList. we will iterate later. when we mint
+        // we will use buyerAddress array to iterate oner the mapping using the address as. they mapping key
 
         buyerAddress.push(buyerAddr);  //push adds the item to the array
         mint(buyerAddr, tokenPurchased, numOfTokens, "");  //mint tokens
@@ -282,50 +284,20 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
 
     // funds raised amount
     uint256 fundsRaised=0;
-    function fundsRaisedSoFar() public view returns (uint256){
-        return (fundsRaised);
-    }
 
 // at this point the code is bieng executed by the invester, so the reipient will be owner_address, where the proceeds
 // from the sale of tokens shd go
-
-/*NOTE: From Solidity 0.8.0 you don't need to declare the address as payable explicitly, but when you are transferring an amount to such address.
-
-See your example below in 0.8.x, adding a function to transfer funds to the owner:
-
-    contract MyContract {
-            address public owner;
-
-                constructor(address oracleAddress) {
-                owner = msg.sender;
-            priceFeed = AggregatorV3Interface(oracleAddress);
-        }
-  
-        function transfer() public payable {
-            payable(owner).transfer(msg.value);
-        }
-    }
-*/
-    function payForTokens(uint256 amount, address recipient) public payable {
+    function payForTokens(uint256 amount, address payable recipient) public payable {
         require(recipient == owner_address , "The recipient address is not authorized!");
-        payable(recipient).transfer(amount); 
+        recipient.transfer(amount);
         fundsRaised += amount;
-    }
-
-    function ownerAddress() public view returns(address ){
-        return (owner_address);
     }
 
 // while refunding the Company is executing this code so msg.sender would be company and the account will be theirs to send from
 // so recipient is the investor
-    function refundForTokens(uint256 tokenid, uint256 count,  uint256 amount, address recipient) public payable {
-        payable(recipient).transfer(amount);
+    function refundForTokens(uint256 tokenid, uint256 count,  uint256 amount, address payable recipient) public payable {
+        recipient.transfer(amount);
         fundsRaised -= amount;
         updateRefundTokenCount(tokenid, count);
     }   
-    function msgsender() public view returns (address){
-        return (msg.sender);
-    }
-
-
 }

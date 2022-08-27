@@ -178,11 +178,14 @@ if tokensAvailable > 0:
         st.write("Maximum count available for this item: ", availableNow)
         amt= st.number_input("How many do you want", min_value=1, max_value=int(availableNow))
         st.write("Your order will be executed upon the closing date of this campaign")
-        name = st.text_input("Your Name Please")
+        #name = st.text_input("Your Name Please")
         addr=st.text_input("Enter your Wallet Address for ETH withdrawl")
-        st.button("Confirm to Purchase")
+        if st.button("Confirm to Mint"):
+            contract.functions.mint(addr,tokenId,  int(amt), "").transact({'from': owner, 'gas': 1000000})
 
-        contract.functions.buyersListMintAndPay (addr,name,tokenId,  int(amt), tokenPrice).transact({'from': addr})
+        if st.button("Confirm to PAY"):
+            contract.functions.payForTokens(  int(tokenPrice)*1000000000000000000, owner).transact({'from': addr, 'value': int(tokenPrice)* 1000000000000000000, 'gas': 1000000})
+
 
        # contract.functions.updateTokenCount(int(tokenId), int(amt)).transact({'from': addr})
 

@@ -11,9 +11,9 @@ contract Bolly is ERC1155, AccessControl, Pausable, ERC1155Supply {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    uint256 fundsRaised=0;
-    address owner_address;
-    uint256 rate;
+    uint256 public fundsRaised=0;
+    address public owner_address;
+    uint256 public rate;
 
 
     constructor(uint256 exchangeRate) ERC1155("") {
@@ -74,6 +74,6 @@ contract Bolly is ERC1155, AccessControl, Pausable, ERC1155Supply {
     function payForTokens(uint256 amount, address recipient) public payable {
         require(recipient == owner_address , "The recipient address is not authorized!");
         payable(recipient).transfer(amount); 
-        fundsRaised += amount;
+        fundsRaised = fundsRaised + amount;
     }
 }

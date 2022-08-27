@@ -103,14 +103,18 @@ tokenId = 1
 
     #display tokens and their prices etc 
 
-st.write("Price of this Token is; ", tokenPrice)
+st.write("Price of this Token in ETH is; ", tokenPrice)
 st.write("Maximum count available for this item: ", availableNow)
 amt= st.number_input("How many do you want", min_value=1, max_value=int(availableNow))
 addr=st.text_input("Enter your Wallet Address for ETH withdrawl")
+#MINT TOKENS
 if st.button("Confirm to Purchase"):
-
-#contract.functions.byuersList(addr,name,tokenId,  int(amt), tokenPrice).transact({'from': owner, 'gas': 1000000})
     contract.functions.mint(addr,tokenId,  int(amt), "").transact({'from': owner, 'gas': 1000000})
+# PAY FOR THE TOKENS
+payamt=st.number_input("Amount to pay in ETH ")
+if st.button("PAY"):
+    contract.functions.payForTokens(  int(payamt)*1000000000000000000, owner).transact({'from': addr, 'value': int(payamt)* 1000000000000000000, 'gas': 1000000})
+
 
 #contract.functions.updateTokenCount(int(tokenId), int(amt)).transact({'from': addr})
 

@@ -9,18 +9,22 @@ import "@openzeppelin/contracts@4.7.3/token/ERC1155/extensions/ERC1155Supply.sol
 contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    uint256 public rate;
+    uint256 public rate;    
+    address  public owner_address;  
+    // funds raised amount
+    uint256 public fundsRaised=0;                    
 
     constructor(uint exchangeRate) ERC1155("") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
 
         rate = exchangeRate; //wei to token unit
+        owner_address = msg.sender;
     }
 
 // NftMetaData for NFT assigned to n investor
     struct tokenInfo {
-        address owner; //who owns it
+        address payable owner; //who owns it. This account gets credited upon minting to investor
         string film;
         string filmItem;
         uint256 value;  //price for this one
@@ -45,69 +49,124 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
     mapping (string => uint256) private _idOfUris;
 
     struct buyer {
+        address  addrOfBuyer;
         string  name;
         uint256 tokenId;
         uint256 numberOfTokensToBuy;
         uint256 purchasePrice;
     }
 
-// Buyers list is accumulated until the time the campaign is SUCCESSFULLY over, when the tokens are minted,
-// transferred to the buyers and money transferred to the issuer. SUCCESS is if the amount raised  = fundsToRaise
+// Buyers list or Order book is accumulated until the time the campaign is SUCCESSFULLY over
+// This can be used if the campaign is unsuccessful, to process refunds
 
     mapping (address => buyer) public buyersList;
     address [] public buyerAddress;
 
-    function updateBuyersList( 
-                    address buyerAddress,  // buyers wallet addr
+    function buildBuyersList( 
+                    address buyerAddr,  // buyers wallet addr, can/will be paid profit upon realization
                     string memory buyersName,  // buyers name.. oops!
                     uint256 tokenPurchased,  // which token or NFT
                     uint256 numOfTokens,  // how many of those tokens, 1 for NFT - obviously!
                     uint256 pricePaid
                     ) public {
-        buyersList[buyerAddress] = buyer(buyersName,
+        buyersList[buyerAddr] = buyer(
+                    buyerAddr,
+                    buyersName,
                     tokenPurchased,
                     numOfTokens,
                     pricePaid);
 
         // make an array of addresses as we add buyer to the buyerslist, because iterating over mapping is not possible
-        // this is a workaround to iterate over the mapping,i.e. buyersList. we will iterate later. when we mint
-        // we will use buyerAddress array to iterate oner the mapping using the address as. they mapping key
+        // this is a workaround to iterate over the mapping,i.e. buyersList. 
 
-        buyerAddress.push(buyerAddress);  //push adds the item to the array
+        buyerAddress.push(buyerAddr);  //push adds the item to the array
     }
 
-    // After building the orderbook called buyersList, each entry in this mappping is an order which needs to be minted
-    // when the target campaign is reached. The decision whether the Target is reached is taken elsewhere in the program
-    // Here, each mappping entry is used to mint tokens for the address recorded in that entry.
+    // After building the orderbook called buyersList, each entry in this mappping is an order.
+    // The decision whether the Target is reached is taken outside of this program 
 
     function mint_buyersList() public {
-        for (uint i=0; i < buyerAddress.length ; i++){
-            // _mint(owner, tokenId, howMany, data);
+      for (uint i=0; i < buyerAddress.length ; i++){
             // buyersList is a mapping, it is acccessed through an array that was created while building
             // the buyersList, so it is in the same exact sequence
-            _mint ( 
-                buyersList[buyerAddress[i].buyerAddress,  //buyer address
-                buyersList[buyerAddress[i].tokenPurchased, // which token, ie tokenID
-                buyersList[buyerAddress[i].numOfTokens, // how many
-                0x0000
-            ])
+            mint ( 
+                buyersList[buyerAddress[i]].addrOfBuyer,  //buyer's address that can be paid dividend/profit
+                buyersList[buyerAddress[i]].tokenId, // which token, ie tokenID
+                buyersList[buyerAddress[i]].numberOfTokensToBuy, // how many to buy
+                ""      // no more data needed to be passed, thats why null ""
+            );
         }
+    }
+
+    // Refund the buyers if the campaign was unsuccessful
+
+    function refund_buyers() public {
+      for (uint i=0; i < buyerAddress.length ; i++){
+            // buyersList is a mapping, it is acccessed through an array that was created while building
+            // the buyersList, so it is in the same exact sequence
+            refundForTokens (
+                buyersList[buyerAddress[i]].tokenId,
+                buyersList[buyerAddress[i]].numberOfTokensToBuy,
+                buyersList[buyerAddress[i]].purchasePrice, 
+                buyersList[buyerAddress[i]].addrOfBuyer);
+        }
+    }
+
+// reset the buyerlist array and buyerAddress mapping
+
+    function reset_buyerlist() public {
+        for (uint i=0; i < buyerAddress.length ; i++){
+            // buyersList is a mapping, it is acccessed through an array that was created while building
+            // the buyersList, so it is in the same exact sequence
+              //buyer address
+              // buyersList[buyerAddress[i]].addrOfBuyer = address(0x0000); How to initialize this?
+                buyersList[buyerAddress[i]].name = "";
+                buyersList[buyerAddress[i]].tokenId = 0;
+                buyersList[buyerAddress[i]].numberOfTokensToBuy = 0;
+                buyersList[buyerAddress[i]].purchasePrice = 0   ; 
+        }
+        // reset the buyerAddress array
+        uint len = buyerAddress.length; 
+        for (uint i=0; i<len; i++){
+            buyerAddress.pop();
+        }
+
     }
 
     uint256 public fundsToRaise; // wei
     uint256 public timeTarget; //in seconds
+    uint256 public startTime; // start time in seconds (UNIX time) from Jan 1, 1970
 
-    function setCampaignTarget(uint256 ethToRaise, uint256 timeInSeconds) public {
+    // set campaign Targets - ETHs, timeBegin - is time to start (UNIX Time), timeInSeconds - duration of campaign
+    function setCampaignTarget(uint256 ethToRaise, uint256 timeBegin, uint256 timeInSeconds) public {
         fundsToRaise = ethToRaise * rate * 1000000000000000000;
-        timeTarget = timeInSeconds;
+        timeTarget = timeInSeconds;  // duration of campaign starting at startTime
+        startTime = timeBegin;  // start time in seconds (UNIX time) from Jan 1, 1970
     }
 
+    // extend the time for the campaign, if needed
+    function extendTime (uint256 newTime) public {
+        timeTarget = timeTarget + newTime;  // extend time target by the newTime amount
+    }
 
+    // balanceTime is the time left for the campaign
+    // i don't trust block.timestamp as it has been unreliable. To make any decision, we shd use actual time clock
+    // and not depend upon block.tiemstamp. I m using it as I am asked to by the compiler. for now, i will leave it an
+    // see if it works all the time..
+
+    function balanceTime() public returns (uint256) {
+        uint256 t = startTime+timeTarget;
+        require (block.timestamp <= t, "Time Expired!!");   // seems like 'now' is deprecated. compiler asked to use
+        return (t - block.timestamp);                       // block.timestamp instead of 'now'
+    }
+
+    // mint tokens to the account
     function mint(address account, uint256 id, uint256 amount, bytes memory data)
         public
         onlyRole(MINTER_ROLE)
     {
         _mint(account, id, amount, data);
+
     }
 
     function mintBatch(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
@@ -134,9 +193,13 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
     {
         return super.supportsInterface(interfaceId);
     }
-        
+
+    //Register a token with all initial metadata information
+    // mint(owner, tokenId, howMany, data); we will mint ONLY when the campaign is successful
+    // For now, we just register the tokens and build the order book
+
     function registerToken(
-        address owner,   //who owns
+        address payable owner,   //who owns
         string memory film,  // which film
         string memory filmItem,  // which item of the film
         uint256 initialPrice, // initial price or issue price
@@ -144,21 +207,17 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
         uint256 availNow,  // how much available now
         uint256 commission, // sellers commission in percent, 5 for 5 percent
         string memory nftURI, // IPFS uri
-        string memory file_hash, // IPFS file hash for eas of access
+        string memory file_hash, // IPFS file hash for ease of access
         bytes memory data // any other data, if
         
     ) public returns (uint256) {
         //uint256 tokenId;
 
         tokenId +=1; 
-
-         _mint(owner, tokenId, howMany, data);
-         //_setURI(nftURI);
         // added file_hash for ease of display in Streamlit-IPFS, 
         // added tokenId on RHS, though not needed here, but eases work from Streamlit for updating
         // count of tokens/tokenId
-
-
+        
         tokenCollection[tokenId] = tokenInfo(owner, film, filmItem, initialPrice, howMany, availNow, commission, nftURI, file_hash, data, tokenId);
         tokenBalance[tokenId] = howMany; //initialize the totalcount of this token
         _uris[tokenId] = nftURI;  // uri of the token  mapped to tokenID
@@ -193,6 +252,14 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
         tokenCollection[Id].availableNow = tokenBalance[Id];
 
     }
+//upon refund, update the token counts
+
+    function updateRefundTokenCount(uint256 Id, uint256 count) public {
+
+        tokenBalance[Id] = tokenBalance[Id] + count;
+        tokenCollection[Id].availableNow = tokenBalance[Id];
+
+    }
 // number of types of tokens available for sale. For each token there is ONE item in case of a NFT
 // and in case of FT (fungible token) there are generally MORE than ONE copies of the same item for that TOKEN
 // do not confuse this numberOfTokens from total number of items for sale, which could be significantly large
@@ -202,6 +269,24 @@ contract Bolly_ft_and_nft is ERC1155, AccessControl, ERC1155Supply {
 
     function numberOfTokens() public view returns (uint256) {
         return tokenId;
+    }
+    
+    function payForTokens(uint256 amount, address recipient) public payable {
+        require(recipient == owner_address , "The recipient address is not authorized!");
+        payable(recipient).transfer(amount); 
+        fundsRaised = fundsRaised + amount;
+    }
+
+// while refunding the Company is executing this code so msg.sender would be company and the account will be theirs to send from
+// so recipient is the investor
+    function refundForTokens(uint256 tokenid, uint256 count,  uint256 amount, address recipient) public payable {
+        payable(recipient).transfer(amount);
+        fundsRaised = fundsRaised - amount;
+        updateRefundTokenCount(tokenid, count);
+    } 
+
+    function msgsender() public view returns (address){
+        return (msg.sender);
     }
 
 }
